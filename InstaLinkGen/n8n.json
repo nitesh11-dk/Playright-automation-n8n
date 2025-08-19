@@ -1,0 +1,477 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "body",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        -544
+      ],
+      "id": "4406bedf-eae2-44c8-8b86-bb461b782c7c",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        -544
+      ],
+      "id": "9aa7c2ae-3862-4389-8500-5fcbc3d099e3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Examples Message : \nusername: travelwithsara\ndescription: An amazing 10-day itinerary exploring the hidden gems of Bali, with tips for affordable stays and local food spots.\n\nYour Response : \n\n🌴 Ready to discover Bali like never before? 🌴  \n\nBeyond the crowded beaches and popular tourist spots lies a side of Bali that few ever see.  \nThis journey takes you through hidden waterfalls, peaceful rice terraces, and vibrant local markets.  \nAlong the way, you’ll discover flavors, traditions, and warm connections that make this island truly unforgettable.  \nIt’s not just about visiting — it’s about experiencing Bali in its purest form.  \n\nCredits: https://instagram.com/travelwithsara\n\nUser MEssgae : \nusernme :{{ $json.username }}\ndescription: {{ $json.description }}\n",
+        "options": {
+          "systemMessage": "=You are a skilled and creative assistant that writes engaging LinkedIn posts.  \nYou will receive:  \n1. The Instagram username of the content creator.  \n2. A short description of their Instagram post.  \n\nYour job:  \n-Write a LinkedIn post description for the PDF (containing the content from that Instagram post) is uploaded.\n- Start with a **strong, attention-grabbing hook**.  \n- Follow with a short, compelling description of what the PDF contains.  \n- End by **crediting the original Instagram creator** in a respectful way, using their profile link.  \n\nRules:  \n- Keep it professional yet friendly.  \n- The hook should spark curiosity.  \n- Mention the value of the PDF to LinkedIn readers.  \n- At the end, add something like: “Credits: https://instagram.com/{username}” or “Special thanks to {username} for the inspiration”.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        -496
+      ],
+      "id": "abc16a91-f632-4f01-b070-74b9976a1e71",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -368
+      ],
+      "id": "f5558a1b-e498-4c24-92d9-5a92a05b97b0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SyT8IN8H22AoeuYG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1iyV2XCsmcdRwsmgc6Vd9gbpRwrQa41gTjNA_OdfzLcw",
+          "mode": "list",
+          "cachedResultName": "Linkdln-post-discription",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iyV2XCsmcdRwsmgc6Vd9gbpRwrQa41gTjNA_OdfzLcw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iyV2XCsmcdRwsmgc6Vd9gbpRwrQa41gTjNA_OdfzLcw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Username": "={{ $('Loop Over Items').item.json.username }}",
+            "Post-Detail": "={{ $('Loop Over Items').item.json.description }}",
+            "Generated-post": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post-Detail",
+              "displayName": "Post-Detail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Generated-post",
+              "displayName": "Generated-post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        752,
+        -736
+      ],
+      "id": "d85a7fdd-f875-4d3f-b33d-2e91a3eb0a52",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "w8e3Yh8KLw12trAf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.pdfExist }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "e97bb5e8-8ef1-400c-ba1b-d49ef311d17d"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6a135516-3bc5-4d94-89e0-2debf2779b1e",
+                    "leftValue": "={{ $json.pdfExist }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -304,
+        -528
+      ],
+      "id": "c3f28daf-64ba-4c1f-a7da-bf31fcf0c0a5",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Examples Message : \nusername: travelwithsara\ndescription: This Week in Business Automation Here are 3 automation trends that caught my attention this week: 1️⃣ AI-POWERED CUSTOMER SERVICE More businesses are using CUSTOM chatbots for instant responses. Result? 67% faster customer satisfaction rates. 2️⃣ PREDICTIVE EMAIL MARKETING Automation tools now predict the best send times for each subscriber. Open rates are increasing by 35%! 3️⃣ SOCIAL MEDIA AUTO-ENGAGEMENT Smart automation can now respond to comments and DMs with personalized messages. Engagement up 45%! The bottom line? Automation isn't just about saving time anymore... it's about next level customer experiences. At Sweet Success Biz, we're always staying ahead of these trends to give our clients the competitive edge they need. Want to know which automation trends could transform YOUR business? 👉 DM me the word AUTOMATE and we'll help you. What automation trend excites you most? Let me know! 💬 #FeatureFriday #AutomationTrends #BusinessAutomation #SweetSuccessBiz #MarketingAutomation #TechTrends #EntrepreneurLife\n\nYour Response : \n\n🚀 The future of customer experience is here — and it’s automated.\n\nThis week, I came across three fascinating automation trends that are reshaping how businesses connect with their audience:\n\n1️⃣ AI-Powered Customer Service\nBusinesses are rolling out custom chatbots capable of giving instant, tailored responses — leading to a 67% boost in customer satisfaction speed.\n\n2️⃣ Predictive Email Marketing\nNew tools now pinpoint the perfect send time for each subscriber, pushing open rates up by 35%.\n\n3️⃣ Social Media Auto-Engagement\nAutomation can now respond to comments and DMs with personalized messages, increasing engagement by 45%.\n\nThe takeaway?\nAutomation has evolved beyond just saving time. It’s about creating next-level, highly personalized customer experiences — and those who embrace it early gain a serious competitive edge.\n\nWhich of these trends would make the biggest impact in your business?\nCredits: https://instagram.com/travelwithsara\n\nUser MEssgae : \nusernme :{{ $json.username }}\ndescription: {{ $json.description }}\n",
+        "options": {
+          "systemMessage": "=You are a skilled and creative assistant that writes engaging, human-like LinkedIn posts.  \nYou will receive:  \n1. The Instagram username of the content creator.  \n2. A short description or caption of their Instagram post.  \n\nYour job:  \n- Write a LinkedIn post that sounds natural and human-written.  \n- Start with a strong, attention-grabbing hook.  \n- Follow with a clear, engaging explanation of the content in the Instagram post.  \n- If the description contains any lists (e.g., “Option 1”, “Tip 2”, “Step 3”), reformat them into a clean, well-presented list that is easy to read.  \n- Keep the language professional yet friendly, as if written by a thoughtful LinkedIn user — avoid overly “AI-sounding” or generic text.  \n- Make use of relevant, tasteful emojis to enhance the tone and readability — not too many, but enough to make it visually engaging.  \n- End with a credit to the original Instagram creator, linking their profile.  \n\nRules:  \n- Make it conversational but polished.  \n- The hook should spark curiosity or offer value.  \n- Structure the post with short paragraphs for readability.  \n- If a list exists, format it using bullet points, numbers, or dashes so it’s visually appealing.  \n- Conclude with something like:  \n  “Credits: https://instagram.com/{username}”  \n  or  \n  “Special thanks to {username} for the inspiration.”  \n- Do not include any disclaimers, risk statements, or asterisks (*) in the final post.  \n- The final result must look like it was written by a human being, not an AI.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        -208
+      ],
+      "id": "3ca7565c-9422-433e-a005-d86e0b0c98a4",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "6b4686fc-1d55-4c63-9e17-d98dea06d870",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SyT8IN8H22AoeuYG",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the string from previous node\nlet text = $input.first().json.output;\n\n// Ensure it's actually a string\nif (typeof text === 'string') {\n  text = text.replace(/\\*/g, ' ');\n}\n\n// Return as n8n item\nreturn [\n  {\n    json: {\n      output: text\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -208
+      ],
+      "id": "5f9e010a-b54b-4d66-a9f7-da4a9d07624c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the string from previous node\nlet text = $input.first().json.output;\n\n// Ensure it's actually a string\nif (typeof text === 'string') {\n  text = text.replace(/\\*/g, ' ');\n}\n\n// Return as n8n item\nreturn [\n  {\n    json: {\n      output: text\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -496
+      ],
+      "id": "5fc59270-1943-4615-aefb-7cd3edd402bf",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "3424fbc1-1cbb-43a4-8da5-e1759e44a2bc",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        -528
+      ],
+      "id": "99134b19-3c20-448f-b612-f3f61426de5b",
+      "name": "Webhook",
+      "webhookId": "3424fbc1-1cbb-43a4-8da5-e1759e44a2bc"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n\"sucess\":true,\n  \"generatedPost\": {{ JSON.stringify($json[\"Generated-post\"]) }}\n}\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1072,
+        -560
+      ],
+      "id": "df78f065-db95-4133-bdad-76ca8987fab0",
+      "name": "this is the last node"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "this is the last node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "headers": {
+          "accept": "*/*",
+          "accept-encoding": "gzip, deflate, br",
+          "content-length": "2678",
+          "content-type": "application/json",
+          "user-agent": "node-fetch",
+          "host": "localhost:5680",
+          "connection": "keep-alive"
+        },
+        "params": {},
+        "query": {},
+        "body": [
+          {
+            "username": "kewalkishan_coach",
+            "description": "📉 Missed deadlines = Missed revenue 👎 No follow-ups = No urgency ⚠️ Lack of tracking = Zero accountability ✅ Automate Tasks gives structure to chaos. Set task priority, frequency & auto-reminders — so nothing slips through. Comment ‘Demo’ to get the link now!👇 . . #businessautomation #taskmanagement #automatetasks #productivitytools #worksmarter #automatebusiness [productivity tools, automation, business automation, business tips, revenue growth, Saas, business growth, time management]",
+            "pdfExist": true
+          },
+          {
+            "username": "code_shank",
+            "description": "📉 Yes — running a business comes with chaos. Missed leads, manual tasks, outdated tools… we’ve seen it all. But it doesn’t have to stay that way. From custom software and automation to streamlined design and integrated systems, we help you run leaner, faster, and smarter — without the tech overwhelm. You focus on growth. We’ll handle the systems. #SmartBusinessTools #CustomSolutions #BusinessAutomation #DigitalSupport #GrowthSimplified #SoftwareForScaling #OpsMadeEasy #ProductivityUnleashed #ProcessPerfection #TechMadeSimple [business automation, custom software solutions, small business systems, task automation, process improvement tools, digital tools for business, scalable tech solutions, integrated software platforms, productivity tools for businesses, tech support for business owners]",
+            "pdfExist": false
+          },
+          {
+            "username": "aiadaptiv",
+            "description": "Smart AI Business Automation Discover how AI agents boost business automation using n8n and Make.com's easy low-code platforms. 🤖✨ AI agents learn and adapt, improving decisions and workflows beyond simple, rigid automation rules. n8n offers flexible drag-and-drop tools plus coding options to customize AI workflows perfectly. Make.com empowers anyone to create intelligent workflows with natural language commands and 2,500+ app integrations. With n8n, AI agents analyze data, engage customers, and automate web tasks—all without complex coding. Make.com's smart agents adjust processes dynamically, enhancing customer support and real-time business actions. Choose n8n for deep customization or Make.com for broad app connections and user-friendly AI tools. Embrace these AI-powered platforms to automate smarter, save time, and grow your business today! 🚀💡 #AIautomation #BusinessAutomation #LowCode #n8n #Makecom #AIAgents #SmartWorkflows #DigitalTransformation #BusinessGrowth #TechForBusiness #AutomationTools #NoCodeNeeded #Innovation #WorkflowAutomation #CustomerEngagement #DataDriven #FutureOfWork #SmallBusinessTech #AIForEveryone #aiAdaptiv",
+            "pdfExist": false
+          }
+        ],
+        "webhookUrl": "http://localhost:5680/webhook/3424fbc1-1cbb-43a4-8da5-e1759e44a2bc",
+        "executionMode": "production"
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d6a1aa77ab9a4735dc6b5630b9ef681e78133c35d18af05b873d8bd3e66474b1"
+  }
+}

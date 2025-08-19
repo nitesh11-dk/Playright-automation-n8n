@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <title>Instagram PDF Creator</title>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+
+<div class="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8">
+  <h1 class="text-3xl font-bold mb-6 text-center text-indigo-600">
+    Instagram PDF Creator
+  </h1>
+
+  <!-- Create PDFs Form -->
+  <form id="createPdfsForm" class="space-y-4">
+    <label for="urls" class="block text-gray-700 font-medium">
+      Instagram Post URLs (one per line):
+    </label>
+    <textarea id="urls" name="urls" rows="6" 
+      class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" 
+      placeholder="https://www.instagram.com/p/xyz123/\nhttps://www.instagram.com/p/abc456/"></textarea>
+
+    <button type="submit" id="createPdfsBtn" 
+      class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition flex justify-center items-center space-x-2">
+      <svg id="pdfLoader" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <span>Create PDFs</span>
+    </button>
+  </form>
+
+  <!-- Progress Display -->
+  <div id="progressContainer" class="mt-6 hidden">
+    <p id="progressText" class="text-lg text-gray-800 font-medium"></p>
+    <div class="w-full bg-gray-200 rounded-full h-3 mt-2 overflow-hidden">
+      <div id="progressBar" class="bg-indigo-600 h-3 rounded-full" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- Server message display -->
+  <div id="serverMessage" class="mt-4 text-center text-lg font-medium"></div>
+  <p id="generatedPost" class="mt-2 p-4 bg-gray-100 rounded text-sm whitespace-pre-wrap"></p>
+
+  
+  <!-- Scraped Data Display -->
+  <h2 class="mt-8 mb-2 text-xl font-semibold text-gray-700">Scraped Data:</h2>
+  <ul id="scrapedDataList" class="list-disc pl-5 space-y-2 text-gray-800 max-h-48 overflow-y-auto border p-4 rounded bg-gray-50">
+    <!-- Dynamic content inserted here -->
+    <li class="text-gray-600" id="noDataMessage">No data scraped yet.</li>
+  </ul>
+
+  <!-- Send Webhook Form -->
+   <!-- Generated Post Display -->
+
+  <form id="sendWebhookForm" action="/send-webhook" method="POST" class="mt-6">
+    <button type="submit" id="sendWebhookBtn" 
+      class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex justify-center items-center space-x-2">
+      <svg id="webhookLoader" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <span>Send Webhook</span>
+    </button>
+  </form>
+</div>
+
+
+  <script>
+    const createPdfsForm = document.getElementById("createPdfsForm");
+  const progressContainer = document.getElementById("progressContainer");
+  const progressText = document.getElementById("progressText");
+  const progressBar = document.getElementById("progressBar");
+  const serverMessage = document.getElementById("serverMessage");
+  const sendWebhookForm = document.getElementById("sendWebhookForm");
+  const pdfLoader = document.getElementById("pdfLoader");
+  const webhookLoader = document.getElementById("webhookLoader");
+  const createPdfsBtn = document.getElementById("createPdfsBtn");
+  const sendWebhookBtn = document.getElementById("sendWebhookBtn");
+  const scrapedDataList = document.getElementById("scrapedDataList");
+  const noDataMessage = document.getElementById("noDataMessage");
+  const generatedPostEl = document.getElementById("generatedPost"); // NEW element for showing generated post
+
+    // Helper: Render scraped data list dynamically
+    function renderScrapedData(data) {
+      if (!Array.isArray(data) || data.length === 0) {
+        scrapedDataList.innerHTML = '<li class="text-gray-600" id="noDataMessage">No data scraped yet.</li>';
+        return;
+      }
+
+      // Clear previous data
+      scrapedDataList.innerHTML = "";
+
+      data.forEach(item => {
+        const li = document.createElement("li");
+        li.classList.add("flex", "flex-wrap", "items-center", "space-x-2");
+
+        // Username
+        const userSpan = document.createElement("strong");
+        userSpan.className = "text-indigo-600";
+        userSpan.textContent = item.username || "Unknown User";
+        li.appendChild(userSpan);
+
+        // Description
+        const descSpan = document.createElement("span");
+        descSpan.textContent = `: ${item.description || "No Description"}`;
+        li.appendChild(descSpan);
+
+        // PDF Exists badge
+        const badgeSpan = document.createElement("span");
+        badgeSpan.className = `ml-2 px-2 py-0.5 text-xs rounded font-semibold ${
+          item.pdfExist ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
+        }`;
+        badgeSpan.textContent = `PDF Exist: ${item.pdfExist ? "Yes" : "No"}`;
+        li.appendChild(badgeSpan);
+
+        scrapedDataList.appendChild(li);
+      });
+    }
+
+    // Initial render: if you have initial scrapedData from server, you can inject it in a script tag or fetch it
+    // For example, if you pass scrapedData as a global variable on page load, call renderScrapedData(scrapedData);
+
+    // Handle Create PDFs form submission
+    createPdfsForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      serverMessage.textContent = "";
+      progressBar.style.backgroundColor = "#4f46e5"; // Reset color
+
+      const textarea = createPdfsForm.querySelector("textarea");
+      const urls = textarea.value.trim().split("\n").map(u => u.trim()).filter(u => u);
+
+      if (urls.length === 0) {
+        alert("Please enter at least one URL.");
+        return;
+      }
+
+      // Disable button and show loader
+      createPdfsBtn.disabled = true;
+      pdfLoader.classList.remove("hidden");
+
+      progressContainer.classList.remove("hidden");
+      progressBar.style.width = "0%";
+      progressText.textContent = `Processing ${urls.length} URLs...`;
+
+      try {
+        const response = await fetch("/create-pdfs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ urls }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server responded with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Update progress and messages
+        progressBar.style.width = "100%";
+        progressText.textContent = "✅ All PDFs created!";
+        serverMessage.textContent = data.message || "Processing complete.";
+
+        // Update scraped data list dynamically
+        renderScrapedData(data.scrapedData);
+
+      } catch (err) {
+        serverMessage.textContent = `❌ Error while creating PDFs: ${err.message}`;
+        progressText.textContent = "Process stopped due to error.";
+        progressBar.style.backgroundColor = "#e53e3e"; // red color
+      } finally {
+        createPdfsBtn.disabled = false;
+        pdfLoader.classList.add("hidden");
+      }
+    });
+
+   // Handle Send Webhook form submission
+  sendWebhookForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!confirm("Are you sure you want to send the webhook with current scraped data?")) return;
+
+    sendWebhookBtn.disabled = true;
+    webhookLoader.classList.remove("hidden");
+    serverMessage.textContent = "Sending webhook...";
+    if (generatedPostEl) generatedPostEl.textContent = ""; // Clear previous generated post
+
+    try {
+      const response = await fetch("/send-webhook", { method: "POST" });
+
+      if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+      const data = await response.json();
+
+      // Show server message from webhook response
+      serverMessage.textContent = data.message || "Webhook sent.";
+
+      // Optionally update scraped data list if returned
+      if (data.scrapedData) {
+        renderScrapedData(data.scrapedData);
+      }
+
+      // Show generated post JSON prettified if available
+      if (data.generatedPost && generatedPostEl) {
+        generatedPostEl.textContent = JSON.stringify(data.generatedPost, null, 2);
+      } else if (generatedPostEl) {
+        generatedPostEl.textContent = "";
+      }
+
+    } catch (err) {
+      serverMessage.textContent = `❌ Error sending webhook: ${err.message}`;
+      if (generatedPostEl) generatedPostEl.textContent = "";
+    } finally {
+      sendWebhookBtn.disabled = false;
+      webhookLoader.classList.add("hidden");
+    }
+  });
+
+    // Optionally: on page load, if you have initial scrapedData from server as global var, call renderScrapedData(scrapedData);
+
+  </script>
+
+</body>
+</html>
