@@ -1,0 +1,674 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        -112
+      ],
+      "id": "c35d39d5-3681-4a18-8561-bef1470388eb",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg",
+          "mode": "list",
+          "cachedResultName": "facebook_cards",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1887773815,
+          "mode": "list",
+          "cachedResultName": "facebook_cards",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg/edit#gid=1887773815"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -2240,
+        -128
+      ],
+      "id": "ff8fcad1-541b-4cde-9e50-b74ba430652d",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gOyvwph2Fty9uVVo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Input 1  :\nName : Name: Zenomorphic Designs (Interior Designers & Project Consultants) \nBio : Zenomorphic Designs (Interior Designers & Project Consultants) | Organisation · 18.3 km · Pune, Maharashtra, India · 142 followers | Zenomorphic Designs, an Interior & Architecture firm based in Pune, Mumbai. India. | Follow\n\nYour Response :\nHi Zenomorphic Designs, your Pune-Mumbai work looks superb yaar! Do you usually handle ghar interiors also, ya only big architecture projects?\n\nUser input 2 : \nName : Name: Interior designer pune (Sudhir Pawar & Associate)  \nBio :  Interior designer pune | Interior designer · 62% recommend · 5.5K followers · 1 post in the last two weeks | At Sudhir Pawar & Associate has become a brand in Interior & Product designing Services. we have consistently maintained highest standards of design excellence. | Follow\n\nYour response : \nHello Sudhir Pawar & Associate, your Pune designs look classy boss! Waise, do you also do product design projects ya mainly interiors?\n\nUser Input : \nName :{{ $json.bio }}\nBio : {{ $json.extra }}\n",
+        "options": {
+          "systemMessage": "=You are a client-style outreach assistant.\nYour job is to send short, natural first messages to interior design or architecture studios that make them feel like a potential client is reaching out.\nDo not sound like a marketer. Instead, create curiosity and make them believe there’s an opportunity to discuss.\n\n✅ Rules\n\nTone: Use 70% English, sprinkle in 30% casual Hinglish , 100% natural, polite, conversational. No heavy Hinglish here — keep it professional yet warm.\n\nMessage Focus: Instead of pitching services directly, start with curiosity about their design style, trends, or projects.\n\nPersonalization: Always include the studio name and location (if available). Optionally reference their bio or description if provided\n\nLength: 15–25 words max.\n\nGoal: Make the studio think you’re a serious potential client or lead, without directly asking for prices.\n\nPersonalization: Mention the studio name + location when available. Reference their bio/project type if possible.\n\nAvoid: Don’t talk about websites, sales, or marketing in the first message. No obvious pitches.\n\nCTA: End with a soft, natural question to encourage a reply."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -1536,
+        144
+      ],
+      "id": "57d36bec-2263-472f-ab2f-1be5ef7f7eef",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        288
+      ],
+      "id": "6a894007-0f67-4b42-a22b-b14491d4a6cb",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jaSpeh47OCHEBZQB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "760e8bdb-b611-4a97-9936-5b8c8c3f1f08",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -2064,
+        -128
+      ],
+      "id": "0b9cc44c-7dcc-4761-9c01-5f6b65b529bd",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1616,
+        -112
+      ],
+      "id": "ab101c40-fe18-4a2c-bc93-637306c31453",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "maxItems": 15
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        -128
+      ],
+      "id": "d0806d23-344b-4cc9-a24c-51424bbfb2fc",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/whatsapp",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "link",
+              "value": "={{ $json.whatsappLink }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('AI Agent1').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -768,
+        16
+      ],
+      "id": "4af4f119-022f-4491-a09f-12d0614a799a",
+      "name": "whatshap-send-message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/facebook",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $('Loop Over Items').item.json.link }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1168,
+        160
+      ],
+      "id": "9a6a96da-9e4a-4b02-8b88-0893a2ad113d",
+      "name": "facebook-send-message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6a2ba13d-d5c8-4fe5-91dc-7e6a7f3b8f89",
+              "leftValue": "={{ $json.whatsappLink }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -976,
+        80
+      ],
+      "id": "097c1a8d-5511-47d5-b642-d9cf6e9c97a7",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg",
+          "mode": "list",
+          "cachedResultName": "facebook_cards",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1887773815,
+          "mode": "list",
+          "cachedResultName": "facebook_cards",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg/edit#gid=1887773815"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "link": "={{ $('Loop Over Items').item.json.link }}",
+            "status": "sent-whatshap-facebook"
+          },
+          "matchingColumns": [
+            "link"
+          ],
+          "schema": [
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "bio",
+              "displayName": "bio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "extra",
+              "displayName": "extra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -416,
+        -32
+      ],
+      "id": "7cf00091-8b55-42b2-89e1-606c7a467643",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gOyvwph2Fty9uVVo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c50c2ce-de3b-4af9-8d4b-b14e0a085271",
+              "leftValue": "={{ $json.sentStatus }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        16
+      ],
+      "id": "de7213f2-583c-415a-974a-74182dd453d8",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg",
+          "mode": "list",
+          "cachedResultName": "facebook_cards",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1887773815,
+          "mode": "list",
+          "cachedResultName": "facebook_cards",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bwAa0cS9tqCzIJ1cnQRks1OaUb0z8W2-varkHS7VOzg/edit#gid=1887773815"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "link": "={{ $('Loop Over Items').item.json.link }}",
+            "status": "sent-facebook"
+          },
+          "matchingColumns": [
+            "link"
+          ],
+          "schema": [
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "bio",
+              "displayName": "bio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "extra",
+              "displayName": "extra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -624,
+        192
+      ],
+      "id": "8aa663e7-afc4-4a19-8a88-3218625cd572",
+      "name": "Update row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gOyvwph2Fty9uVVo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        240
+      ],
+      "id": "405a63da-2908-426b-bef4-20d14c3cdb97",
+      "name": "Wait1",
+      "webhookId": "cf6126c1-fdfa-464a-ba64-ca9a2113a737"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "facebook-send-message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "whatshap-send-message": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "facebook-send-message": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "whatshap-send-message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "44b6b0581231cf0648945e97c4b15adf52102210c0661bec54342c7dc57a02c3"
+  }
+}
